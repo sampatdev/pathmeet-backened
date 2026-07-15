@@ -14,25 +14,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Create .env for build
         run: |
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
           echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+
+      - name: Pull images
+        run: docker compose pull
 
       - name: Build and start full stack
         run: docker compose up --build -d
 
       - name: Wait for API to be healthy
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -sf http://localhost:8000/health; then
               echo "API is up"
               exit 0
             fi
             echo "Waiting for API... ($i)"
-            sleep 2
+            sleep 5
           done
           echo "API did not become healthy in time"
+          docker compose ps
           docker compose logs
           exit 1
 
