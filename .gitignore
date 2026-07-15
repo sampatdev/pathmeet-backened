@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+.env
+test_ws*.py
+test_kafka*.py
+alembic/versions/__pycache__/
+.DS_Store
